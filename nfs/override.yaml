@@ -1,0 +1,19 @@
+parent:
+  claiming:
+    enabled: true
+    token: YOUR_CLAIM_TOKEN
+    rooms: YOUR_ROOM_ID_A,YOUR_ROOM_ID_B
+
+child:
+  claiming:
+    enabled: true
+    token: YOUR_CLAIM_TOKEN
+    rooms: YOUR_ROOM_ID_A,YOUR_ROOM_ID_B
+  configs:
+    netdata:
+      data: |
+        [global]
+          memory mode = ram
+          history = 3600
+        [health]
+          enabled = no

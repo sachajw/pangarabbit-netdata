@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pi8s-nfs-csi-k8sstate-netdata-pvc
+spec:
+  storageClassName: nfs-csi-k8sstate-netdata
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
