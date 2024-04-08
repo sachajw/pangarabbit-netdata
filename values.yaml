@@ -42,7 +42,7 @@ sysctlInitContainer:
   resources: {}
 
 service:
-  type: LoadBalancer
+  type: ClusterIP
   port: 19999
   annotations: {}
   ## Only to be used with type LoadBalancer
@@ -55,22 +55,20 @@ service:
   # clusterIP: 10.1.2.3
 
 ingress:
-  enabled: true
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    kubernetes.io/tls-acme: "true"
+  enabled: false
+  annotations: {}
   path: /
   pathType: Prefix
   hosts:
-    - netdata.lair.pangarabbit.com
+    - netdata.pangarabbit.com
   ## whole spec is going to be included into ingress spec.
   ## if you intend to use ingressClassName declaration, remove ingress.class from annotations
-  # spec:
-  #   ingressClassName: nginx
-  # tls:
-  #   - secretName: netdata-tls
-  #     hosts:
-  #       - netdata.k8s.local
+  spec:
+    ingressClassName: nginx
+  tls:
+    - secretName: netdata-tls
+      hosts:
+        - netdata.pangarabbit.com
 
 rbac:
   create: true
@@ -81,7 +79,7 @@ serviceAccount:
   name: netdata
 
 restarter:
-  enabled: false
+  enabled: true
   schedule: "00 06 * * *"
   image:
     repository: bitnami/kubectl
@@ -157,15 +155,15 @@ parent:
   dnsPolicy: Default
 
   database:
-    persistence: true
+    persistence: false
     ## Set '-' as the storageclass to get a volume from the default storage class.
-    storageclass: "nfs-csi-database-netdata"
+    storageclass: "-"
     volumesize: 2Gi
 
   alarms:
     persistence: true
     ## Set '-' as the storageclass to get a volume from the default storage class.
-    storageclass: "nfs-csi-alarms-netdata"
+    storageclass: "-"
     volumesize: 1Gi
 
   configs:
@@ -191,11 +189,20 @@ parent:
           proc = no
           idlejitter = no
           diskspace = no
+        [logs]
+          # logs to trigger flood protection = 1000
+          # logs flood protection period = 60
+          # facility = daemon
+          level = debug
+          # daemon = journal
+          # collector = journal
+          # access = /var/log/netdata/access.log
+          # health = /var/log/netdata/health.log
     stream:
       enabled: true
       path: /etc/netdata/stream.conf
       data: |
-        [11111111-2222-3333-4444-555555555555]
+        [N6fMP2k2RvYIGmMsZWLNL4P7huCtgePU6ooEo-]
           enabled = yes
           history = 3600
           default memory mode = dbengine
@@ -426,7 +433,7 @@ k8sState:
   persistence:
     enabled: true
     ## Set '-' as the storageclass to get a volume from the default storage class.
-    storageclass: "nfs-csi-k8sstate-netdata"
+    storageclass: "-"
     volumesize: 1Gi
 
   configs:

@@ -1,0 +1,17 @@
+# dashboard.yaml
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: netdata
+  namespace: netdata
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`netdata.pangarabbit.com`)
+      kind: Rule
+      services:
+        - name: netdata
+          namespace: netdata
+          kind: Service
+          port: 19999
