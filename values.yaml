@@ -56,7 +56,8 @@ service:
 
 ingress:
   enabled: false
-  annotations: {}
+  annotations:
+    annotations.kubernetes.io/ingress.class: traefik
   path: /
   pathType: Prefix
   hosts:
@@ -64,7 +65,7 @@ ingress:
   ## whole spec is going to be included into ingress spec.
   ## if you intend to use ingressClassName declaration, remove ingress.class from annotations
   spec:
-    ingressClassName: nginx
+    ingressClassName: traefik
   tls:
     - secretName: netdata-tls
       hosts:
@@ -155,7 +156,7 @@ parent:
   dnsPolicy: Default
 
   database:
-    persistence: false
+    persistence: true
     ## Set '-' as the storageclass to get a volume from the default storage class.
     storageclass: "-"
     volumesize: 2Gi
@@ -175,7 +176,27 @@ parent:
           hostname = netdata-parent
         [db]
           mode = dbengine
-
+        [ml]
+          enabled = yes
+          # maximum num samples to train = 21600
+          # minimum num samples to train = 900
+          # train every = 10800
+          # number of models per dimension = 18
+          # dbengine anomaly rate every = 30
+          # num samples to diff = 1
+          # num samples to smooth = 3
+          # num samples to lag = 5
+          # random sampling ratio = 0.2
+          # maximum number of k-means iterations = 1000
+          # dimension anomaly score threshold = 0.99
+          # host anomaly rate threshold = 1.0
+          # anomaly detection grouping method = average
+          # anomaly detection grouping duration = 300
+          # hosts to skip from training = !*
+          # charts to skip from training = netdata.*
+          # dimension anomaly rate suppression window = 900
+          # dimension anomaly rate suppression threshold = 450
+          # delete models older than = 604800
         [plugins]
           cgroups = no
           tc = no
@@ -189,11 +210,12 @@ parent:
           proc = no
           idlejitter = no
           diskspace = no
+
         [logs]
           # logs to trigger flood protection = 1000
           # logs flood protection period = 60
           # facility = daemon
-          level = debug
+          level = info
           # daemon = journal
           # collector = journal
           # access = /var/log/netdata/access.log
@@ -312,7 +334,26 @@ child:
         [health]
           enabled = no
         [ml]
-          enabled = no
+          enabled = yes
+          # maximum num samples to train = 21600
+          # minimum num samples to train = 900
+          # train every = 10800
+          # number of models per dimension = 18
+          # dbengine anomaly rate every = 30
+          # num samples to diff = 1
+          # num samples to smooth = 3
+          # num samples to lag = 5
+          # random sampling ratio = 0.2
+          # maximum number of k-means iterations = 1000
+          # dimension anomaly score threshold = 0.99
+          # host anomaly rate threshold = 1.0
+          # anomaly detection grouping method = average
+          # anomaly detection grouping duration = 300
+          # hosts to skip from training = !*
+          # charts to skip from training = netdata.*
+          # dimension anomaly rate suppression window = 900
+          # dimension anomaly rate suppression threshold = 450
+          # delete models older than = 604800
     stream:
       enabled: true
       path: /etc/netdata/stream.conf
